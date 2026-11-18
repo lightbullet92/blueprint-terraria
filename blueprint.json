@@ -1,0 +1,164 @@
+{
+  "manifestVersion": 1,
+  "id": "com.kubek.terraria.auto",
+  "name": "Terraria",
+  "shortName": "Terraria",
+  "description": "Official Dedicated Server for Terraria (Linux x86_64)",
+  "game": "terraria",
+  "icon": "icon.png",
+  "author": { "name": "Rivero92" },
+  "version": "1.0.0",
+  "tags": ["terraria", "sandbox", "survival", "vanilla"],
+  "engines": { "kubek": ">=4.0.0" },
+  "platforms": ["linux"],
+  "runtime": { "kind": "native" },
+  "variables": [
+    {
+      "key": "GAME_VERSION",
+      "label": "Version",
+      "type": "enum",
+      "options": { "from": "versions" },
+      "rules": "required",
+      "userEditable": true
+    },
+    {
+      "key": "WORLD_NAME",
+      "label": "World Name",
+      "type": "string",
+      "default": "World",
+      "rules": "required",
+      "userEditable": true
+    },
+    {
+      "key": "WORLD_SIZE",
+      "label": "World Size (1=Small, 2=Medium, 3=Large)",
+      "type": "enum",
+      "options": [
+        { "value": "1", "label": "Small (1)" },
+        { "value": "2", "label": "Medium (2)" },
+        { "value": "3", "label": "Large (3)" }
+      ],
+      "default": "2",
+      "rules": "required",
+      "userEditable": true
+    },
+    {
+      "key": "DIFFICULTY",
+      "label": "Difficulty (0=Classic, 1=Expert, 2=Master, 3=Journey)",
+      "type": "enum",
+      "options": [
+        { "value": "0", "label": "Classic (0)" },
+        { "value": "1", "label": "Expert (1)" },
+        { "value": "2", "label": "Master (2)" },
+        { "value": "3", "label": "Journey (3)" }
+      ],
+      "default": "0",
+      "rules": "required",
+      "userEditable": true
+    },
+    {
+      "key": "MAX_PLAYERS",
+      "label": "Max Players",
+      "type": "number",
+      "default": 8,
+      "rules": "required",
+      "userEditable": true
+    },
+    {
+      "key": "SERVER_PASSWORD",
+      "label": "Server Password",
+      "type": "string",
+      "default": "",
+      "userEditable": true
+    },
+    {
+      "key": "MOTD",
+      "label": "Message of the Day (MOTD)",
+      "type": "string",
+      "default": "Welcome to Terraria Server!",
+      "userEditable": true
+    },
+    {
+      "key": "WORLD_SEED",
+      "label": "World Seed (optional)",
+      "type": "string",
+      "default": "",
+      "userEditable": true
+    },
+    {
+      "key": "SECURE",
+      "label": "Anti-Cheat Protection (1=On, 0=Off)",
+      "type": "enum",
+      "options": [
+        { "value": "1", "label": "Enabled (1)" },
+        { "value": "0", "label": "Disabled (0)" }
+      ],
+      "default": "1",
+      "userEditable": true
+    },
+    {
+      "key": "LAUNCH_ARGS",
+      "label": "Launch arguments",
+      "type": "string",
+      "default": "",
+      "userEditable": true
+    }
+  ],
+  "versions": {
+    "kind": "resolver",
+    "module": "versions.ts"
+  },
+  "install": {
+    "runIn": "host",
+    "steps": [
+      {
+        "type": "download",
+        "url": "{{DOWNLOAD_URL}}",
+        "dest": "terraria.zip",
+        "unpack": true
+      },
+      {
+        "type": "writeFile",
+        "path": "serverconfig.txt",
+        "content": "world=worlds/{{WORLD_NAME}}.wld\nautocreate={{WORLD_SIZE}}\nseed={{WORLD_SEED}}\nworldname={{WORLD_NAME}}\ndifficulty={{DIFFICULTY}}\nmaxplayers={{MAX_PLAYERS}}\nport={{SERVER_PORT}}\npassword={{SERVER_PASSWORD}}\nmotd={{MOTD}}\nworldpath=worlds\nbanlist=banlist.txt\nsecure={{SECURE}}\nlanguage=ru-RU\nupnp=0\nnpcstream=60\npriority=1\n"
+      }
+    ]
+  },
+  "startup": {
+    "command": "mkdir -p worlds && if [ ! -f TerrariaServer.bin.x86_64 ]; then cp -rn */Linux/* . && chmod +x TerrariaServer TerrariaServer.bin.x86_64; fi && sed -i -e 's|\\r||g' -e 's|^world=.*|world=worlds/{{WORLD_NAME}}.wld|' -e 's|^worldname=.*|worldname={{WORLD_NAME}}|' -e 's|^autocreate=.*|autocreate={{WORLD_SIZE}}|' -e 's|^seed=.*|seed={{WORLD_SEED}}|' -e 's|^difficulty=.*|difficulty={{DIFFICULTY}}|' -e 's|^maxplayers=.*|maxplayers={{MAX_PLAYERS}}|' -e 's|^port=.*|port={{SERVER_PORT}}|' -e 's|^password=.*|password={{SERVER_PASSWORD}}|' -e 's|^motd=.*|motd={{MOTD}}|' -e 's|^secure=.*|secure={{SECURE}}|' serverconfig.txt && { while IFS= read -r l; do printf '%s\\n' \"$l\"; [ \"$l\" = \"exit\" ] && break; done; } | exec ./TerrariaServer.bin.x86_64 -config serverconfig.txt {{LAUNCH_ARGS}}",
+    "stop": { "type": "command", "value": "exit" }
+  },
+  "detection": {
+    "running": [
+      "Server started",
+      "Listening on port",
+      "Сервер запущен",
+      "Прослушивание порта"
+    ],
+    "stopping": [
+      "Saving world data",
+      "Backing up world file",
+      "Сохранение данных мира",
+      "Резервное копирование файла мира",
+      "Сохранение перед выходом"
+    ]
+  },
+  "query": {
+    "protocol": "gamedig:terraria",
+    "port": { "fromVariable": "SERVER_PORT" }
+  },
+  "ports": [
+    {
+      "key": "game",
+      "label": "Game",
+      "default": 7777,
+      "protocol": "tcp",
+      "env": "SERVER_PORT",
+      "primary": true
+    }
+  ],
+  "configFiles": [
+    { "path": "serverconfig.txt", "parser": "properties", "label": "Server Config" }
+  ],
+  "features": ["console", "backups", "files", "players"]
+}

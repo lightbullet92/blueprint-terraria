@@ -1,0 +1,9 @@
+node_modules/
+.DS_Store
+bun.lock
+package-lock.json
+*.kbp
+build.zip
+Thumbs.db
+*.log
+npm-debug.log*

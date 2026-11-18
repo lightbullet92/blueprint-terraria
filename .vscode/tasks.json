@@ -1,0 +1,30 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Build .kbp package",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "windows": {
+        "type": "process",
+        "command": "powershell.exe",
+        "args": [
+          "-NoProfile",
+          "-Command",
+          "$bp = Get-Content 'blueprint.json' -Raw | ConvertFrom-Json; $out = '${workspaceFolderBasename}-' + $bp.version + '.kbp'; Remove-Item -Force -ErrorAction SilentlyContinue $out, 'build.zip'; Compress-Archive -Path 'blueprint.json', 'versions.ts', 'icon.png' -DestinationPath 'build.zip'; Rename-Item -Path 'build.zip' -NewName $out; Write-Host ('Built: ' + $out)"
+        ]
+      },
+      "linux": {
+        "type": "shell",
+        "command": "VER=$(grep -oE '\"version\"[[:space:]]*:[[:space:]]*\"[^\"]+\"' blueprint.json | head -n 1 | cut -d'\"' -f4) && OUT=\"${workspaceFolderBasename}-${VER}.kbp\" && rm -f \"$OUT\" && (zip -q \"$OUT\" blueprint.json versions.ts icon.png 2>/dev/null || python3 -m zipfile -c \"$OUT\" blueprint.json versions.ts icon.png) && echo \"Built: $OUT\""
+      },
+      "osx": {
+        "type": "shell",
+        "command": "VER=$(grep -oE '\"version\"[[:space:]]*:[[:space:]]*\"[^\"]+\"' blueprint.json | head -n 1 | cut -d'\"' -f4) && OUT=\"${workspaceFolderBasename}-${VER}.kbp\" && rm -f \"$OUT\" && (zip -q \"$OUT\" blueprint.json versions.ts icon.png 2>/dev/null || python3 -m zipfile -c \"$OUT\" blueprint.json versions.ts icon.png) && echo \"Built: $OUT\""
+      },
+      "problemMatcher": []
+    }
+  ]
+}
