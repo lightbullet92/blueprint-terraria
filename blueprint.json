@@ -31,15 +31,11 @@
     },
     {
       "key": "WORLD_SIZE",
-      "label": "World Size (1=Small, 2=Medium, 3=Large)",
+      "label": "World Size (1 = Small, 2 = Medium, 3 = Large)",
       "type": "enum",
       "options": {
         "from": "static",
-        "values": [
-          { "value": "1", "label": "Small (1)" },
-          { "value": "2", "label": "Medium (2)" },
-          { "value": "3", "label": "Large (3)" }
-        ]
+        "values": ["1", "2", "3"]
       },
       "default": "2",
       "rules": "required",
@@ -47,16 +43,11 @@
     },
     {
       "key": "DIFFICULTY",
-      "label": "Difficulty (0=Classic, 1=Expert, 2=Master, 3=Journey)",
+      "label": "Difficulty (0 = Classic, 1 = Expert, 2 = Master, 3 = Journey)",
       "type": "enum",
       "options": {
         "from": "static",
-        "values": [
-          { "value": "0", "label": "Classic (0)" },
-          { "value": "1", "label": "Expert (1)" },
-          { "value": "2", "label": "Master (2)" },
-          { "value": "3", "label": "Journey (3)" }
-        ]
+        "values": ["0", "1", "2", "3"]
       },
       "default": "0",
       "rules": "required",
@@ -93,14 +84,11 @@
     },
     {
       "key": "SECURE",
-      "label": "Anti-Cheat Protection (1=On, 0=Off)",
+      "label": "Anti-Cheat Protection (1 = Enabled, 0 = Disabled)",
       "type": "enum",
       "options": {
         "from": "static",
-        "values": [
-          { "value": "1", "label": "Enabled (1)" },
-          { "value": "0", "label": "Disabled (0)" }
-        ]
+        "values": ["1", "0"]
       },
       "default": "1",
       "userEditable": true
